@@ -3012,6 +3012,25 @@
       });
     });
 
+    onClick('miya-st-exit-app', function () {
+      dialog({
+        mode: 'confirm',
+        title: '退出应用',
+        message: '确定要退出 Luv，回到主屏吗？',
+        confirmText: '退出',
+        cancelText: '取消'
+      }).then(function (ok) {
+        if (!ok) return;
+        try {
+          if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.exitApp) {
+            window.webkit.messageHandlers.exitApp.postMessage('exit');
+            return;
+          }
+        } catch (e) { /* 忽略 */ }
+        toast('仅在 Luv App 中可用');
+      });
+    });
+
     app.querySelectorAll('[data-st-nav]').forEach(function (row) {
       row.addEventListener('click', function () {
         var target = row.getAttribute('data-st-nav');
