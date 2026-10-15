@@ -1510,13 +1510,31 @@
     }
   }
 
+  function describeApiError(err) {
+    var msg = String((err && err.message) || '').trim();
+    if (!msg) return '未知错误';
+    if (msg === 'empty') return '网关地址格式不正确';
+    if (msg.indexOf('network') === 0) {
+      return '无法连接网关：地址不对、服务不支持网页跨域调用(CORS)、或网络不通';
+    }
+    if (msg === 'HTTP 401' || msg === 'HTTP 403') return '密钥无效或没有访问权限（HTTP ' + msg.slice(5) + '）';
+    if (msg === 'HTTP 404') return '网关地址不对（检查是否以 /v1 结尾）';
+    if (/^HTTP /.test(msg)) return '网关返回错误：' + msg.slice(5);
+    return msg;
+  }
+
   async function fetchOpenAiModels(base, key) {
     var root = openAiCompatibleApiRoot(base);
     if (!root) throw new Error('empty');
-    var r = await fetch(root + '/models', {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + String(key || '').trim() }
-    });
+    var r;
+    try {
+      r = await fetch(root + '/models', {
+        method: 'GET',
+        headers: { Authorization: 'Bearer ' + String(key || '').trim() }
+      });
+    } catch (err) {
+      throw new Error('network: ' + String((err && err.message) || 'failed'));
+    }
     if (!r.ok) throw new Error('HTTP ' + r.status);
     var j = await r.json();
     if (!Array.isArray(j.data)) return [];
@@ -3226,7 +3244,7 @@
         fetchOpenAiModels(b, k).then(function (ids) {
           fillModelSelect($('miya-st-' + prefix + '-model'), ids, ($('miya-st-' + prefix + '-model') || {}).value);
           toast('已载入 ' + ids.length + ' 个模型');
-        }).catch(function () { toast('连接失败'); });
+        }).catch(function (err) { toast(describeApiError(err)); });
       });
     }
 
@@ -3248,7 +3266,7 @@
       fetchOpenAiModels(b, k).then(function (ids) {
         fillModelSelect($('miya-st-chat-model'), ids, $('miya-st-chat-model').value);
         toast('已载入 ' + ids.length + ' 个模型');
-      }).catch(function () { toast('连接失败'); });
+      }).catch(function (err) { toast(describeApiError(err)); });
     });
 
     onClick('miya-st-chat2-fetch', function () {
@@ -3258,7 +3276,7 @@
       fetchOpenAiModels(b, k).then(function (ids) {
         fillModelSelect($('miya-st-chat2-model'), ids, $('miya-st-chat2-model').value);
         toast('已载入 ' + ids.length + ' 个模型');
-      }).catch(function () { toast('连接失败'); });
+      }).catch(function (err) { toast(describeApiError(err)); });
     });
 
     onClick('miya-st-chat-save', function () {
