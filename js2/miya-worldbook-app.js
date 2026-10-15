@@ -488,6 +488,8 @@
 
     var wbBack = $('miya-wb-header-back') || $('miya-wb-back');
     if (wbBack) wbBack.addEventListener('click', closeWorldbookApp);
+    var wbClose = $('miya-wb-close');
+    if (wbClose) wbClose.addEventListener('click', closeWorldbookApp);
     $('miya-wb-add').addEventListener('click', function () { fillEditor(null); });
     $('miya-wb-editor-back').addEventListener('click', closeEditor);
     $('miya-wb-save').addEventListener('click', saveEditor);
