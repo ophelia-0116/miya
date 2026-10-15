@@ -214,7 +214,7 @@
 
 .miya-worldbook-app .st-header--wb {
   position: relative;
-  padding-right: 56px;
+  padding-right: 104px;
 }
 
 .miya-worldbook-app .st-header--topnav {
@@ -233,6 +233,21 @@
   top: calc(env(safe-area-inset-top, 0px) + 8px);
   right: 0;
   margin: 0;
+}
+
+.miya-worldbook-app .st-header--wb .st-wb-close-btn {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 8px);
+  right: 48px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--st-text-tertiary);
+}
+
+.miya-worldbook-app.has-editor .st-wb-close-btn {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .miya-worldbook-app .st-header h2 {
