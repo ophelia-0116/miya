@@ -4,7 +4,7 @@
 (function (global) {
   'use strict';
 
-  var FILE_ACCEPT = '.txt,.docx,.css,text/plain,text/css,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  var FILE_ACCEPT = '.txt,.docx,.css,.json,text/plain,text/css,application/json,application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
   function looksLikeCssBlock(text) {
     var s = String(text || '').trim();
@@ -16,6 +16,16 @@
   function extractCssFromText(raw) {
     var s = String(raw || '').replace(/^\uFEFF/, '').trim();
     if (!s) return '';
+
+    /* 支持 css_theme 第三方主题 JSON：提取其中的 css 字段 */
+    if (s.charAt(0) === '{') {
+      try {
+        var obj = JSON.parse(s);
+        if (obj && typeof obj.css === 'string' && obj.css.trim()) {
+          return obj.css.trim();
+        }
+      } catch (e) { /* 不是 JSON，继续走原逻辑 */ }
+    }
 
     var fenced = s.match(/```(?:css)?\s*\r?\n([\s\S]*?)```/i);
     if (fenced && fenced[1].trim()) return fenced[1].trim();
