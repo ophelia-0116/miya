@@ -1567,6 +1567,11 @@
         try {
           var text = reader.result;
           var data = JSON.parse(text);
+          /* 聊天气泡主题 JSON（css_theme 类型）不属于桌面装扮，给出正确入口提示 */
+          if (data && data.type === 'css_theme' && typeof data.css === 'string') {
+            toast('这是聊天气泡主题，请到聊天设置 → 美化 → 快捷导入');
+            return;
+          }
           var tpl = global.MiyaDeskCustomWidgetTemplates;
           /* 单独的自定义小组件 JSON 也可从方案页导入 */
           if (
